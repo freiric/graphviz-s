@@ -2,11 +2,13 @@ package uk.co.turingatemyhamster.graphvizs.dsl
 
 import org.specs2.mutable._
 import org.specs2.matcher.ParserMatchers
+import org.specs2.matcher.ExpectedParsedResult._
 import org.junit.runner.RunWith
 import org.specs2.runner.JUnitRunner
 
 @RunWith(classOf[JUnitRunner])
-class DotAstParserSpec extends Specification with ParserMatchers {
+class DotAstParserSpec extends SpecificationLike with ParserMatchers {
+  override def described(s: String): Described = super.described(s)
 
   val parsers = new DotAstParser
   import parsers._
@@ -23,17 +25,17 @@ class DotAstParserSpec extends Specification with ParserMatchers {
 
 
   lazy val astSpec = new Specification {
-    "implicit ast conversions" should {
+    "implicit ast conversions should" >> {
 
       "promote string to ID" in {
         ("a" : ID) must_== ID.Identifier("a")
       }
       
-      "promote double to ID" should {
+      "promote double to ID should" >> {
         (1.0 : ID) must_== ID.Numeral(1.0)
       }
 
-      "prmote int to ID" should {
+      "prmote int to ID should" >>  {
         (1 : ID) must_== ID.Numeral(1.0)
       }
 
@@ -65,7 +67,7 @@ class DotAstParserSpec extends Specification with ParserMatchers {
   }
 
   lazy val cstrSpec = new Specification {
-    "utility constructors" should {
+    "utility constructors should" >> {
 
       "build attribute list from no args" in {
         AttributeList() must_== AttributeList(None, None)
@@ -95,22 +97,22 @@ class DotAstParserSpec extends Specification with ParserMatchers {
   }
 
   lazy val idSpec = new Specification {
-    "identifier parser" should {
+    inExample ("identifier parser should") >> {
 
       "parse letter-only identifiers" in {
-        id must succeedOn("abcd").withResult(ID.Identifier("abcd") : ID)
+        id must succeedOn("abcd").withResult(toExpectedParsedResult(ID.Identifier("abcd") : ID))
       }
 
       "parse alphanumerics starting with a letter" in {
-        id must succeedOn("ab786876").withResult(ID.Identifier("ab786876") : ID)
+        id must succeedOn("ab786876").withResult(toExpectedParsedResult(ID.Identifier("ab786876") : ID))
       }
 
       "parse numeric negative double" in {
-        id must succeedOn("-1234.3453").withResult(ID.Numeral(-1234.3453) : ID)
+        id must succeedOn("-1234.3453").withResult(toExpectedParsedResult(ID.Numeral(-1234.3453) : ID))
       }
 
       "parse numeric for 1" in {
-        id must succeedOn("1").withResult(ID.Numeral(1.0) : ID)
+        id must succeedOn("1").withResult(toExpectedParsedResult(ID.Numeral(1.0) : ID))
       }
 
       "be unable to parse numeric for 1 with the id_identifier parser" in {
@@ -118,7 +120,7 @@ class DotAstParserSpec extends Specification with ParserMatchers {
       }
 
       "parse numeric for 1 with the id_numeral parser" in {
-        id_numeral must succeedOn("1").withResult(ID.Numeral(1.0))
+        id_numeral must succeedOn("1").withResult(toExpectedParsedResult(ID.Numeral(1.0)))
       }
 
       "be unable to parse numeric for 1 with the id_quoted_string parser" in {
@@ -129,7 +131,7 @@ class DotAstParserSpec extends Specification with ParserMatchers {
   }
 
   lazy val attributeSpec = new Specification {
-    "attribute assignment parser" should {
+    "attribute assignment parser should" >> {
 
       "parse attribute with name only" in {
        attribute_assignment must succeedOn("a").withResult(AttributeAssignment("a", None))
@@ -148,7 +150,7 @@ class DotAstParserSpec extends Specification with ParserMatchers {
 
 
   lazy val statementSpec = new Specification {
-    "individual statement parser" should {
+    "individual statement parser should" >> {
 
       "parse a node statement with no attributes" in {
         node_statement must succeedOn("n1").withResult(NodeStatement("n1", None))
@@ -181,32 +183,32 @@ class DotAstParserSpec extends Specification with ParserMatchers {
   }
 
   lazy val statementListSpec = new Specification {
-    "statement_list parser" should {
+    inExample ("statement_list parser should") >> {
 
       "parse the empty string" in {
-        statement_list must succeedOn("").withResult(Seq[Statement]())
+        statement_list must succeedOn("").withResult(toExpectedParsedResult(Seq[Statement]()))
       }
 
       "parse one node statement" in {
-        statement_list must succeedOn("n1").withResult(Seq(NodeStatement("n1", None) : Statement))
+        statement_list must succeedOn("n1").withResult(toExpectedParsedResult(Seq(NodeStatement("n1", None) : Statement)))
       }
 
       "parse one assignment statement" in {
-        statement_list must succeedOn("a = b").withResult(Seq(AssignmentStatement("a", "b") : Statement))
+        statement_list must succeedOn("a = b").withResult(toExpectedParsedResult(Seq(AssignmentStatement("a", "b") : Statement)))
       }
 
       "parse one assignment statement with a trailing semi-colon" in {
-        statement_list must succeedOn("a = b;").withResult(Seq(AssignmentStatement("a", "b") : Statement))
+        statement_list must succeedOn("a = b;").withResult(toExpectedParsedResult(Seq(AssignmentStatement("a", "b") : Statement)))
       }
 
       "parse two assignment statements" in {
-        statement_list must succeedOn("a = b ; c = d").withResult(Seq(AssignmentStatement("a", "b") : Statement, AssignmentStatement("c", "d")))
+        statement_list must succeedOn("a = b ; c = d").withResult(toExpectedParsedResult(Seq(AssignmentStatement("a", "b") : Statement, AssignmentStatement("c", "d"))))
       }
     }
   }
 
   lazy val subgraphSpec = new Specification {
-    "subgraph parser" should {
+    inExample("subgraph parser should") >> {
 
       "parse an empty subgraph" in {
         subgraph must succeedOn("subgraph {}").withResult(Subgraph(None, Seq()))
@@ -228,7 +230,7 @@ class DotAstParserSpec extends Specification with ParserMatchers {
 
 
   lazy val graphSpec = new Specification {
-    "graph parser" should {
+    "graph parser should" >> {
 
       "parse an empty graph" in {
         graph must succeedOn("""graph {}""").withResult(Graph(false, GraphType.Graph, None, Seq()))
